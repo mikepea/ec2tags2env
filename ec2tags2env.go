@@ -1,16 +1,19 @@
 package main
 
 import "fmt"
-import "net/http"
+import "github.com/aws/aws-sdk-go/aws/session"
+import "github.com/aws/aws-sdk-go/aws/ec2metadata"
 
-func getInstanceId() string {
-	resp, err := http.Get("http://169.254.169.254/latest/meta-data/instance-id")
+func getInstanceID() string {
+	sess := session.Must(session.NewSession())
+	svc := ec2metadata.New(sess)
+	doc, err := svc.GetInstanceIdentityDocument()
 	if err != nil {
 		panic(err)
 	}
-	return resp.Body()
+	return doc.InstanceID
 }
 
 func main() {
-	fmt.Println(getInstanceId)
+	fmt.Println(getInstanceID())
 }
